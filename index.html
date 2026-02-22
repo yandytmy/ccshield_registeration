@@ -127,7 +127,7 @@ function loadTeamData() {
         const mDiv = document.createElement('div');
         mDiv.className = "member-row";
         mDiv.innerHTML = `
-            <div class="member-name">${m.mem}. ${m.cn} (${m.en})出生日期: ${m.dob}</div>
+            <div class="member-name">${m.mem}. ${m.cn} (${m.en}) 出生日期: ${m.dob}</div>
             <br>
             <div class="checklist-box">
                 <div class="select-all-btn" onclick="selectAll('${m.mem}')">✅ 一鍵全選 (A-F)</div>
@@ -137,7 +137,7 @@ function loadTeamData() {
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格（已續證）</div>
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 會員證與身份證明文件的中英文姓名相符</div>
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服（顏色膠巾圈、黑色綁帶皮鞋等）</div>
-                <textarea id="note_${m.mem}" placeholder="${m.mem} 違規狀況 (如：戴小狼頭、白襪、不是挷帶黑皮鞋)"></textarea>
+                <textarea id="note_${m.mem}" placeholder="${m.mem} G. 違規狀況 (如：戴小狼頭、白襪、不是綁帶黑皮鞋)"></textarea>
             </div>
         `;
         container.appendChild(mDiv);
