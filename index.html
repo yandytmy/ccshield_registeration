@@ -57,7 +57,6 @@
         </div>
     
     <hr>
-    <textarea id="remarkG" placeholder="G. 違規狀況備註 (如：領巾顏色、鞋具不符)"></textarea>
     <button class="btn-success" onclick="finalSubmit()">確認並提交全隊資料</button>
   </div>
 
@@ -128,17 +127,17 @@ function loadTeamData() {
         const mDiv = document.createElement('div');
         mDiv.className = "member-row";
         mDiv.innerHTML = `
-            <div class="member-name">${m.mem}. ${m.cn} (${m.en})</div>
-            <div class="member-detail">出生日期: ${m.dob}</div>
+            <div class="member-name">${m.mem}. ${m.cn} (${m.en})出生日期: ${m.dob}</div>
             <br>
             <div class="checklist-box">
                 <div class="select-all-btn" onclick="selectAll('${m.mem}')">✅ 一鍵全選 (A-F)</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="A"> A. 身份證明文件</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="B"> B. 幼童軍紀錄冊</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="C"> C. 有效紀錄冊(印章)</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 姓名相符</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="A"> A. 出示身份證明文件(身份證、回鄉證、護照或學生證／手冊)</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="B"> B. 出示幼童軍紀錄冊</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="C"> C. 有效幼童軍紀錄冊（新紀錄冊第1至3、5、8至9頁，或舊紀錄冊第1至3、5、10至11頁，並於第1頁及第5頁蓋上旅團印章）</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格（已續證）</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 會員證與身份證明文件的中英文姓名相符</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服（顏色膠巾圈、黑色綁帶皮鞋等）</div>
+                <textarea id="note_${m.mem}" placeholder="${m.mem} 違規狀況 (如：戴小狼頭、白襪、不是挷帶黑皮鞋)"></textarea>
             </div>
         `;
         container.appendChild(mDiv);
@@ -157,12 +156,10 @@ async function finalSubmit() {
     const rawNo = document.getElementById('teamNo').value;
     const teamKey = rawNo.padStart(2, '0');
     const members = remoteTeamData[teamKey];
-    const note = document.getElementById('remarkG').value;
 
-    // 停用按鈕防止重複點擊
     const submitBtn = document.querySelector('.btn-success');
     submitBtn.disabled = true;
-    submitBtn.innerText = "正在提交中...";
+    submitBtn.innerText = "正在提交全隊資料...";
 
     const promises = members.map(m => {
         const formData = new FormData();
@@ -170,28 +167,26 @@ async function finalSubmit() {
         formData.append(ENTRIES.teamId, teamKey);
         formData.append(ENTRIES.memId, m.mem); 
         
-        const items = ['A', 'B', 'C', 'D', 'E', 'F'];
-        items.forEach(code => {
+        // 抓取 A-F 勾選狀態
+        ['A', 'B', 'C', 'D', 'E', 'F'].forEach(code => {
             const isChecked = document.querySelector(`.cb_${m.mem}[data-code="${code}"]`).checked;
-            formData.append(ENTRIES['result' + code], isChecked ? "OK" : "");
+            formData.append(ENTRIES['result' + code], isChecked ? "OK" : "FAILED");
         });
 
-        formData.append(ENTRIES.note, note);
+        // 重要修正：根據 ID 抓取該位賽員的專屬備註
+        const individualNote = document.getElementById(`note_${m.mem}`).value;
+        formData.append(ENTRIES.note, individualNote);
 
-        // 返回 fetch 的 Promise
         return fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
     });
 
     try {
-        // 等待所有隊員的資料都發送出去
         await Promise.all(promises);
-        
-        // 顯示成功畫面
         document.getElementById('step3').classList.add('hidden');
         document.getElementById('step4').classList.remove('hidden');
         window.scrollTo(0, 0);
     } catch (err) {
-        alert("提交過程出現錯誤，請檢查網路連線。");
+        alert("網路錯誤，請重試");
         submitBtn.disabled = false;
         submitBtn.innerText = "確認並提交全隊資料";
     }
