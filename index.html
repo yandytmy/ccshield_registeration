@@ -73,12 +73,18 @@
 const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyqgap791bh5UI5NuPYK7nA86posKZIGBKESWSc-mv3A6XKnlDzgFY4xK_ZgbN5NkA/exec";
 
 // ========== 2. Google Form 設定 ==========
-const FORM_URL = "https://docs.google.com/forms/d/e/您的ID/formResponse";
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeR5ESTo7IWleRlI5KDEBnhI3xJpwR0hTkOWKMKe9tFcM9kSQ/formResponse";
 const ENTRIES = {
-    staff: "entry.111111",
-    teamId: "entry.222222",
-    result: "entry.333333", // 儲存所有隊員的檢查結果
-    note: "entry.444444"
+    staff: "entry.1007120810",
+    teamId: "entry.1465479015",
+    memId: "entry.1426192719",
+    resultA: "entry.1833090949", // 儲存所有隊員的檢查結果
+    resultB: "entry.1695763412", // 儲存所有隊員的檢查結果
+    resultC: "entry.1961756043", // 儲存所有隊員的檢查結果
+    resultD: "entry.466169006", // 儲存所有隊員的檢查結果
+    resultE: "entry.343479111", // 儲存所有隊員的檢查結果
+    resultF: "entry.2039460295", // 儲存所有隊員的檢查結果
+    note: "entry.1273670747"
 };
 
 let remoteTeamData = null; // 用來儲存從網路上抓到的資料
@@ -146,34 +152,48 @@ function selectAll(memCode) {
     checkboxes.forEach(cb => cb.checked = true);
 }
 
-function finalSubmit() {
+async function finalSubmit() {
     const rawNo = document.getElementById('teamNo').value;
     const teamKey = rawNo.padStart(2, '0');
-    const members = remoteTeamData[teamKey]; // 修正：從 remoteTeamData 讀取
-    let allResults = "";
-
-    members.forEach(m => {
-        const checked = Array.from(document.querySelectorAll(`.cb_${m.mem}:checked`))
-                             .map(cb => cb.getAttribute('data-code'))
-                             .join('');
-        allResults += `[${m.mem}:${checked || 'FAIL'}] `;
-    });
-
+    const members = remoteTeamData[teamKey];
     const note = document.getElementById('remarkG').value;
 
-    const formData = new FormData();
-    formData.append(ENTRIES.staff, currentStaff);
-    formData.append(ENTRIES.teamId, teamKey);
-    formData.append(ENTRIES.result, allResults);
-    formData.append(ENTRIES.note, note);
+    // 停用按鈕防止重複點擊
+    const submitBtn = document.querySelector('.btn-success');
+    submitBtn.disabled = true;
+    submitBtn.innerText = "正在提交中...";
 
-    fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData })
-    .then(() => {
+    const promises = members.map(m => {
+        const formData = new FormData();
+        formData.append(ENTRIES.staff, currentStaff);
+        formData.append(ENTRIES.teamId, teamKey);
+        formData.append(ENTRIES.memId, m.mem); 
+        
+        const items = ['A', 'B', 'C', 'D', 'E', 'F'];
+        items.forEach(code => {
+            const isChecked = document.querySelector(`.cb_${m.mem}[data-code="${code}"]`).checked;
+            formData.append(ENTRIES['result' + code], isChecked ? "OK" : "");
+        });
+
+        formData.append(ENTRIES.note, note);
+
+        // 返回 fetch 的 Promise
+        return fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
+    });
+
+    try {
+        // 等待所有隊員的資料都發送出去
+        await Promise.all(promises);
+        
+        // 顯示成功畫面
         document.getElementById('step3').classList.add('hidden');
         document.getElementById('step4').classList.remove('hidden');
-        window.scrollTo(0, 0); // 回到頂部看到成功訊息
-    })
-    .catch(err => alert("提交失敗，請檢查網路。"));
+        window.scrollTo(0, 0);
+    } catch (err) {
+        alert("提交過程出現錯誤，請檢查網路連線。");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "確認並提交全隊資料";
+    }
 }
 
 function resetToTeamSelection() {
