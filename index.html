@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>比賽報到核對系統 v2</title>
+<title>CC Shield Registeration</title>
 <style>
   :root { --primary: #1E88E5; --success: #43A047; --bg: #f4f4f4; --dark: #333; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; }
@@ -35,7 +35,7 @@
 </head>
 <body>
 
-<header>📋 幼童軍比賽報到系統</header>
+<header>📋 2026年香港總監挑戰盾總決賽 報到系統</header>
 
 <div class="container">
   <div id="step1" class="card">
@@ -193,11 +193,28 @@ async function finalSubmit() {
 }
 
 function resetToTeamSelection() {
+    // 1. 清空所有輸入欄位
     document.getElementById('teamNo').value = "";
-    document.getElementById('remarkG').value = "";
+    
+    // 2. 徹底清空隊員清單容器，防止殘留
+    const container = document.getElementById('memberListContainer');
+    if (container) container.innerHTML = ""; 
+
+    // 3. 隱藏「成功畫面」(Step 4)，顯示「隊伍輸入」(Step 2)
     document.getElementById('step4').classList.add('hidden');
     document.getElementById('step2').classList.remove('hidden');
+
+    // 4. 重置提交按鈕狀態（恢復為可點擊）
+    const submitBtn = document.querySelector('.btn-success');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "確認並提交全隊資料";
+    }
+
+    // 5. 畫面捲動回頂部
+    window.scrollTo(0, 0);
 }
+
 </script>
 </body>
 </html>
