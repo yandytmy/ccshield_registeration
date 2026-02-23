@@ -17,7 +17,7 @@
   /* Member Info Table */
   .member-row { background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 15px; }
   .member-name { font-weight: bold; color: var(--primary); font-size: 18px; }
-  .member-detail { width: 100%; height: 60px; }
+  .member-icon { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 2px solid #ddd; background: #eee; /* 圖片載入前的底色 */ }
 
   /* Checklist Style */
   .checklist-box { background: #fffbe6; padding: 10px; border-radius: 8px; border: 1px solid #ffe58f; }
@@ -113,32 +113,38 @@ function goStep2() {
 function loadTeamData() {
     const rawNo = document.getElementById('teamNo').value;
     const teamKey = rawNo.padStart(2, '0');
-    
-    // 從遠端資料中找對應隊伍
     const members = remoteTeamData[teamKey];
 
-    if (!members) return alert("找不到該隊伍資料，請檢查隊號 (01-27)");
+    if (!members) return alert("找不到該隊伍資料");
 
     document.getElementById('displayTeamTitle').innerText = "隊伍 " + teamKey + " 報到核對";
     const container = document.getElementById('memberListContainer');
     container.innerHTML = ""; 
 
     members.forEach((m) => {
+        // 如果你的圖片在 Google Drive，這裡可以做一個簡單的自動轉換 (選擇性)
+        let iconUrl = m.icon || "";
+        if (iconUrl.includes("drive.google.com")) {
+            const fileId = iconUrl.split('/d/')[1]?.split('/')[0];
+            iconUrl = `https://lh3.googleusercontent.com/u/0/d/${fileId}`;
+        }
+
         const mDiv = document.createElement('div');
         mDiv.className = "member-row";
         mDiv.innerHTML = `
-            <div class="member-name">${m.mem}. ${m.cn} (${m.en}) 出生日期: ${m.dob}</div>
-            <div class="member-detail"><img src="${m.icon}"></div>
-            <br>
+            <div class="member-header">
+                <div class="member-info-text">${m.mem}. ${m.cn} (${m.en}) 出生日期: ${m.dob}</div>
+                <img src="${iconUrl}" class="member-icon" onerror="this.src='https://via.placeholder.com/80?text=No+Img'">
+            </div>
             <div class="checklist-box">
                 <div class="select-all-btn" onclick="selectAll('${m.mem}')">✅ 一鍵全選 (A-F)</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="A"> A. 出示身份證明文件(身份證、回鄉證、護照或學生證／手冊)</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="B"> B. 出示幼童軍紀錄冊</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="C"> C. 有效幼童軍紀錄冊（新紀錄冊第1至3、5、8至9頁，或舊紀錄冊第1至3、5、10至11頁，並於第1頁及第5頁蓋上旅團印章）</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格（已續證）</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 會員證與身份證明文件的中英文姓名相符</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服（顏色膠巾圈、黑色綁帶皮鞋等）</div>
-                <textarea id="note_${m.mem}" placeholder="G. 違規狀況 (如：戴小狼頭、白襪、不是綁帶黑皮鞋)"></textarea>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="A"> A. 身份證明文件</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="B"> B. 幼童軍紀錄冊</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="C"> C. 有效紀錄冊(印章)</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 姓名相符</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服</div>
+                <textarea id="note_${m.mem}" placeholder="G. 違規狀況備註"></textarea>
             </div>
         `;
         container.appendChild(mDiv);
