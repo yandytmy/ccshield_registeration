@@ -46,7 +46,7 @@
 
   <div id="step2" class="card hidden">
     <h3>識別隊伍</h3>
-    <input type="number" id="teamNo" placeholder="請輸入隊號 (01-27)" min="1" max="27">
+    <input type="number" id="teamNo" placeholder="請輸入隊號 (01-26)" min="1" max="26">
     <button class="btn-primary" onclick="loadTeamData()">搜尋隊伍</button>
     <button style="background:#888; color:white;" onclick="location.reload()">返回登入</button>
   </div>
@@ -141,10 +141,10 @@ function loadTeamData() {
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="A"> A. 身份證明文件</div>
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="B"> B. 幼童軍紀錄冊</div>
                 <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="C"> C. 有效紀錄冊(印章)</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 姓名相符</div>
-                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服</div>
-                <textarea id="note_${m.mem}" placeholder="G. 違規狀況備註"></textarea>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="D"> D. 有效會員資格（已續證）</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="E"> E. 中英文姓名、相片相符</div>
+                <div class="check-item"><input type="checkbox" class="cb_${m.mem}" data-code="F"> F. 穿着整齊制服（顏色膠巾圈、黑色綁帶皮鞋等）</div>
+                <textarea id="note_${m.mem}" placeholder="G. 違規狀況備註(如：戴小狼頭、白襪、不是綁帶黑皮鞋)"></textarea>
             </div>
         `;
         container.appendChild(mDiv);
